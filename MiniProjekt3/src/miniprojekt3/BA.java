@@ -1,75 +1,100 @@
 package miniprojekt3;
 
+import java.awt.Color;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import att.grappa.Attribute;
+import att.grappa.Edge;
+import att.grappa.Graph;
+import att.grappa.GrappaSupport;
+import att.grappa.Node;
+
 public class BA {
-	
-	static BA ba;
-	// Kripke-Structure 
-		static Set<State> initialStatesLTS = new HashSet<State>();
-		static Set<State> statesLTS = new HashSet<State>();
-		static Set<Transition> transitionsLTS = new HashSet<Transition>();
-		static Set<AP> atomicPrepositionsLTS = new HashSet<AP>();
-		
-		//Büchi-Automata
-		static Set<State> initialStatesBA = new HashSet<State>();
-		static Set<State> statesBA = new HashSet<State>();
-		static Set<State> acceptingStatesBA = new HashSet<State>();
-		static Set<Transition> transitionsBA = new HashSet<Transition>();
-		static Set<AP> atomicPrepositionsBA = new HashSet<AP>();
-		static Set<AP> alphabetBA = new HashSet<AP>();
-		
 
-	public Set<State> getStatesBA() {
-		return statesBA;
+	Set<BAState> bAStates = new HashSet<BAState>();
+	Set<BAState> initialStates = new HashSet<BAState>();
+	Set<BAState> acceptingStates = new HashSet<BAState>();
+	Set<BATransition> transitions = new HashSet<BATransition>();
+	Set<Action> alphabet = new HashSet<Action>();
+
+	public BA(Set<BAState> bAStates, Set<BAState> initialStates,
+			Set<BAState> acceptingStates, Set<BATransition> transitions,
+			Set<Action> alphabet) {
+		super();
+		this.bAStates = bAStates;
+		this.initialStates = initialStates;
+		this.acceptingStates = acceptingStates;
+		this.transitions = transitions;
+		this.alphabet = alphabet;
 	}
 
-	public Set<Transition> getTransitionsBA() {
-		return transitionsBA;
+	public Set<BAState> getStates() {
+		return bAStates;
 	}
 
-	public Set<State> getInitialStatesBA() {
-		return initialStatesBA;
+	public Set<BAState> getInitialStates() {
+		return initialStates;
 	}
 
-	public Set<AP> getAlphabetBA() {
-		return alphabetBA;
+	public Set<BAState> getAcceptingStates() {
+		return acceptingStates;
 	}
 
-	public Set<State> getAcceptingStatesBA() {
-		return acceptingStatesBA;
+	public Set<BATransition> getTransitions() {
+		return transitions;
 	}
 
-	public BA(Set<State> states, Set<AP> alphabet, Set<Transition> transitions,
-			Set<State> initialStates, Set<State> as) {
-		BA.statesBA = states;
-		BA.transitionsBA = transitions;
-		BA.initialStatesBA = initialStates;
-		BA.alphabetBA = alphabet;
-		BA.acceptingStatesBA = as;
-	}
-	
-	public BA() {
-		// TODO Auto-generated constructor stub
+	public Set<Action> getAlphabet() {
+		return alphabet;
 	}
 
-	public static BA transformToBA(LTS lts){
-		State a = new State("A");
-		initialStatesBA.add(a);
-		initialStatesLTS = lts.getInitialStates();
-		statesBA = lts.getStates();
-		alphabetBA = lts.getAtomicPropositions();
-		acceptingStatesBA = lts.getStates();
-		transitionsBA = lts.getTransitions();
-		
-		//for each state in initstate füge Transition von a nach initialStateLTS hinzu
-		for(State s : initialStatesLTS){
-		Transition t = new Transition(a, s);
-		transitionsBA.add(t);
+	public Graph createGraph(String path) {
+		Graph graph = new Graph("BA");
+
+		for (BAState s : this.getStates()) {
+			Node n = new Node(graph, s.getName());
+			graph.addNode(n);
 
 		}
-		
-		return ba = new BA(statesBA, alphabetBA, transitionsBA, initialStatesBA, acceptingStatesBA);
+
+		for (BATransition t : this.getTransitions()) {
+			Edge edge = new Edge(graph, graph.findNodeByName(t.getBegin()
+					.getName()), graph.findNodeByName(t.getEnd().getName()));
+			edge.setAttribute(Attribute.LABEL_ATTR, "" + t.getActions());
+			graph.addEdge(edge);
 		}
+
+		for (BAState s : this.getInitialStates()) {
+			Node n = graph.findNodeByName(s.getName());
+			Node invis = new Node(graph);
+			Edge start = new Edge(graph, invis, n);
+			graph.addEdge(start);
+			invis.setAttribute(Attribute.STYLE_ATTR, "invis");
+			n.setAttribute(Attribute.COLOR_ATTR, Color.RED);
+			n.setAttribute(Attribute.FILLCOLOR_ATTR, Color.RED);
+			n.setAttribute(Attribute.FONTCOLOR_ATTR, Color.RED);
+		}
+
+		for (BAState s : this.getAcceptingStates()) {
+			Node n = graph.findNodeByName(s.getName());
+			n.setAttribute(Attribute.SHAPE_ATTR, Node.DOUBLECIRCLE_SHAPE);
+		}
+
+		String[] processArgs = { "./graphviz-2.38/release/bin/dot.exe",
+				"-Tpng", "-o", path }; // Output-Path
+
+		Process formatProcess;
+		try {
+			formatProcess = Runtime.getRuntime().exec(processArgs, null, null);
+			GrappaSupport.filterGraph(graph, formatProcess);
+			formatProcess.getOutputStream().close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+		return graph;
+	}
+
 }

@@ -10,29 +10,29 @@ import java.util.Stack;
 
 public class LTLChecker {
 	
-	Set<State> initialStates = new HashSet<State>();
-	Set<State> states = new HashSet<State>();
-	Set<Transition> transitions = new HashSet<Transition>();
+	Set<BAState> initialStates = new HashSet<BAState>();
+	Set<BAState> bAStates = new HashSet<BAState>();
+	Set<KSTransition> kSTransitions = new HashSet<KSTransition>();
 	
 	// for the search of SCC
-		Set<Transition> possibleTransitions = new HashSet<Transition>();
-		HashMap<State, Integer> indexTable = new HashMap<>();
-		HashMap<State, Integer> lowlinkTable = new HashMap<>();
+		Set<KSTransition> possibleTransitions = new HashSet<KSTransition>();
+		HashMap<BAState, Integer> indexTable = new HashMap<>();
+		HashMap<BAState, Integer> lowlinkTable = new HashMap<>();
 		int index = 0;
-		Stack<State> stack = new Stack<State>();
+		Stack<BAState> stack = new Stack<BAState>();
 	
-	public LTLChecker(LTS lts){
-		this.initialStates = lts.getInitialStates();
-		this.states = lts.getStates();
-		this.transitions = lts.getTransitions();
+	public LTLChecker(KS ks){
+		this.initialStates = ks.getInitialStates();
+		this.bAStates = ks.getStates();
+		this.kSTransitions = ks.getTransitions();
 		
 	}
-	private Set<State> getSCC(Set<State> possibleStates) {
+	private Set<BAState> getSCC(Set<BAState> possibleStates) {
 
-		Set<State> SCC = new HashSet<State>();
-		possibleTransitions = new HashSet<Transition>();
+		Set<BAState> SCC = new HashSet<BAState>();
+		possibleTransitions = new HashSet<KSTransition>();
 
-		for (Transition t : transitions) {
+		for (KSTransition t : kSTransitions) {
 			if (possibleStates.contains(t.getBegin())
 					&& possibleStates.contains(t.getEnd())) {
 				possibleTransitions.add(t);
@@ -43,11 +43,11 @@ public class LTLChecker {
 		lowlinkTable = new HashMap<>();
 		index = 0;
 
-		stack = new Stack<State>();
+		stack = new Stack<BAState>();
 
-		for (State s : possibleStates) {
+		for (BAState s : possibleStates) {
 			if (!indexTable.containsKey(s)) {
-				Set<State> temp = strongConnect(s);
+				Set<BAState> temp = strongConnect(s);
 
 				SCC.addAll(temp);
 			}
@@ -56,20 +56,20 @@ public class LTLChecker {
 		return SCC;
 	}
 
-	private Set<State> strongConnect(State s) {
-		Set<State> SCC = new HashSet<State>();
+	private Set<BAState> strongConnect(BAState s) {
+		Set<BAState> SCC = new HashSet<BAState>();
 
 		indexTable.put(s, index);
 		lowlinkTable.put(s, index);
 		index++;
 		stack.push(s);
 
-		for (Transition t : possibleTransitions) {
+		for (KSTransition t : possibleTransitions) {
 			if (s.equals(t.getBegin())) {
-				State nextState = t.getEnd();
+				BAState nextState = t.getEnd();
 
 				if (!indexTable.containsKey(nextState)) {
-					Set<State> temp = strongConnect(nextState);
+					Set<BAState> temp = strongConnect(nextState);
 
 					SCC.addAll(temp);
 
@@ -87,8 +87,8 @@ public class LTLChecker {
 		}
 
 		if (lowlinkTable.get(s) == indexTable.get(s)) {
-			State SccState;
-			Set<State> temp = new HashSet<State>();
+			BAState SccState;
+			Set<BAState> temp = new HashSet<BAState>();
 
 			do {
 				SccState = stack.pop();
@@ -97,7 +97,7 @@ public class LTLChecker {
 
 			boolean hasTransition = false;
 
-			for (Transition t : possibleTransitions) {
+			for (KSTransition t : possibleTransitions) {
 				if (temp.contains(t.getBegin()) && temp.contains(t.getEnd())) {
 					hasTransition = true;
 					break;
@@ -111,6 +111,6 @@ public class LTLChecker {
 			return SCC;
 		}
 
-		return new HashSet<State>();
+		return new HashSet<BAState>();
 	}
 }

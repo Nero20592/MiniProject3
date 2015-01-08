@@ -7,7 +7,7 @@ import java.util.Set;
 public class CTLFormula {
 	
 	String formula;
-	Set<State> satisfiedStates = new HashSet<State>();
+	Set<BAState> satisfiedStates = new HashSet<BAState>();
 	
 	public CTLFormula(String f){
 		this.formula = f.toLowerCase();
@@ -21,11 +21,11 @@ public class CTLFormula {
 		this.formula = f;
 	}
 
-	public Set<State> getStates(){
+	public Set<BAState> getStates(){
 		return satisfiedStates;
 	}
 	
-	public void setStates(Set<State> s){
+	public void setStates(Set<BAState> s){
 		this.satisfiedStates = s;
 	}
 }

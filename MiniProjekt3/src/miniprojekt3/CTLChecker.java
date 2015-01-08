@@ -9,27 +9,27 @@ import java.util.Stack;
 
 public class CTLChecker {
 
-	Set<State> initialStates = new HashSet<State>();
-	Set<State> states = new HashSet<State>();
-	Set<Transition> transitions = new HashSet<Transition>();
+	Set<BAState> initialStates = new HashSet<BAState>();
+	Set<BAState> bAStates = new HashSet<BAState>();
+	Set<KSTransition> kSTransitions = new HashSet<KSTransition>();
 
 	// for the search of SCC
-	Set<Transition> possibleTransitions = new HashSet<Transition>();
-	HashMap<State, Integer> indexTable = new HashMap<>();
-	HashMap<State, Integer> lowlinkTable = new HashMap<>();
+	Set<KSTransition> possibleTransitions = new HashSet<KSTransition>();
+	HashMap<BAState, Integer> indexTable = new HashMap<>();
+	HashMap<BAState, Integer> lowlinkTable = new HashMap<>();
 	int index = 0;
-	Stack<State> stack = new Stack<State>();
+	Stack<BAState> stack = new Stack<BAState>();
 
-	public CTLChecker(LTS lts) {
-		this.initialStates = lts.getInitialStates();
-		this.states = lts.getStates();
-		this.transitions = lts.getTransitions();
+	public CTLChecker(KS ks) {
+		this.initialStates = ks.getInitialStates();
+		this.bAStates = ks.getStates();
+		this.kSTransitions = ks.getTransitions();
 	}
 
 	public boolean checkFormula(CTLFormula f) {
-		f.setStates(states);
+		f.setStates(bAStates);
 
-		Set<State> satisfiedStates = checkFormulaRek(f);
+		Set<BAState> satisfiedStates = checkFormulaRek(f);
 
 		if (satisfiedStates.containsAll(initialStates)) {
 			return true;
@@ -38,9 +38,9 @@ public class CTLChecker {
 		return false;
 	}
 
-	private Set<State> checkFormulaRek(CTLFormula f) {
+	private Set<BAState> checkFormulaRek(CTLFormula f) {
 
-		Set<State> satisfiedStates = new HashSet<State>();
+		Set<BAState> satisfiedStates = new HashSet<BAState>();
 
 		String str = f.getString().trim();
 
@@ -126,13 +126,13 @@ public class CTLChecker {
 			satisfiedStates = checkEU(f1, f2);
 
 		} else if (str.startsWith("true")) {
-			satisfiedStates = states;
+			satisfiedStates = bAStates;
 
 		} else if (str.startsWith("false")) {
 			satisfiedStates.clear();
 
 		} else {
-			for (State s : states) {
+			for (BAState s : bAStates) {
 				for (AP ap : s.getAPs()) {
 					String label = ap.getLabel().toLowerCase();
 
@@ -209,28 +209,28 @@ public class CTLChecker {
 		return str.length();
 	}
 
-	private Set<State> checkNOT(CTLFormula f) {
+	private Set<BAState> checkNOT(CTLFormula f) {
 
-		Set<State> formulaStates = checkFormulaRek(f);
+		Set<BAState> formulaStates = checkFormulaRek(f);
 
 		// initilisierung mit allen möglichen states
-		Set<State> satisfiedStates = states;
+		Set<BAState> satisfiedStates = bAStates;
 
-		for (State s : formulaStates) {
+		for (BAState s : formulaStates) {
 			satisfiedStates.remove(s);
 		}
 
 		return satisfiedStates;
 	}
 
-	private Set<State> checkAND(CTLFormula f1, CTLFormula f2) {
+	private Set<BAState> checkAND(CTLFormula f1, CTLFormula f2) {
 
-		Set<State> formulaStates1 = checkFormulaRek(f1);
-		Set<State> formulaStates2 = checkFormulaRek(f2);
+		Set<BAState> formulaStates1 = checkFormulaRek(f1);
+		Set<BAState> formulaStates2 = checkFormulaRek(f2);
 
-		Set<State> satisfiedStates = new HashSet<State>();
+		Set<BAState> satisfiedStates = new HashSet<BAState>();
 
-		for (State s : formulaStates1) {
+		for (BAState s : formulaStates1) {
 			if (formulaStates2.contains(s)) {
 				satisfiedStates.add(s);
 			}
@@ -239,18 +239,18 @@ public class CTLChecker {
 		return satisfiedStates;
 	}
 
-	private Set<State> checkOR(CTLFormula f1, CTLFormula f2) {
+	private Set<BAState> checkOR(CTLFormula f1, CTLFormula f2) {
 
-		Set<State> formulaStates1 = checkFormulaRek(f1);
-		Set<State> formulaStates2 = checkFormulaRek(f2);
+		Set<BAState> formulaStates1 = checkFormulaRek(f1);
+		Set<BAState> formulaStates2 = checkFormulaRek(f2);
 
-		Set<State> satisfiedStates = formulaStates1;
+		Set<BAState> satisfiedStates = formulaStates1;
 		satisfiedStates.addAll(formulaStates2);
 
 		return satisfiedStates;
 	}
 
-	private Set<State> checkEX(CTLFormula f) {
+	private Set<BAState> checkEX(CTLFormula f) {
 
 		/*
 		 * EX φ (next)
@@ -259,11 +259,11 @@ public class CTLChecker {
 		 * satisfy EX φ
 		 */
 
-		Set<State> formulaStates = checkFormulaRek(f);
+		Set<BAState> formulaStates = checkFormulaRek(f);
 
-		Set<State> satisfiedStates = new HashSet<State>();
+		Set<BAState> satisfiedStates = new HashSet<BAState>();
 
-		for (Transition t : transitions) {
+		for (KSTransition t : kSTransitions) {
 			if (formulaStates.contains(t.getEnd())) {
 				satisfiedStates.add(t.getBegin());
 			}
@@ -272,7 +272,7 @@ public class CTLChecker {
 		return satisfiedStates;
 	}
 
-	private Set<State> checkEG(CTLFormula f) {
+	private Set<BAState> checkEG(CTLFormula f) {
 
 		/*
 		 * EG φ (always)
@@ -283,20 +283,20 @@ public class CTLChecker {
 		 * is reachable to satisfy EG φ
 		 */
 
-		Set<State> formulaStates = checkFormulaRek(f);
+		Set<BAState> formulaStates = checkFormulaRek(f);
 
-		Set<State> SCC = getSCC(formulaStates);
+		Set<BAState> SCC = getSCC(formulaStates);
 
-		Set<State> satisfiedStates = SCC;
+		Set<BAState> satisfiedStates = SCC;
 
-		Queue<State> queue = new LinkedList<State>();
+		Queue<BAState> queue = new LinkedList<BAState>();
 		queue.addAll(SCC);
 
 		while (!queue.isEmpty()) {
-			State currentState = queue.remove();
+			BAState currentState = queue.remove();
 
-			for (Transition tra : transitions) {
-				State nextState = tra.getBegin();
+			for (KSTransition tra : kSTransitions) {
+				BAState nextState = tra.getBegin();
 
 				if (currentState.equals(tra.getEnd())
 						&& !satisfiedStates.contains(nextState)
@@ -311,7 +311,7 @@ public class CTLChecker {
 		return satisfiedStates;
 	}
 
-	private Set<State> checkEU(CTLFormula f1, CTLFormula f2) {
+	private Set<BAState> checkEU(CTLFormula f1, CTLFormula f2) {
 
 		/*
 		 * E[φ U ψ] (until)
@@ -321,20 +321,20 @@ public class CTLChecker {
 		 * satisfy EU[φ U ψ]
 		 */
 
-		Set<State> formulaStates1 = checkFormulaRek(f1);
-		Set<State> formulaStates2 = checkFormulaRek(f2);
+		Set<BAState> formulaStates1 = checkFormulaRek(f1);
+		Set<BAState> formulaStates2 = checkFormulaRek(f2);
 
-		Set<State> satisfiedStates = new HashSet<State>();
+		Set<BAState> satisfiedStates = new HashSet<BAState>();
 
-		Queue<State> queue = new LinkedList<State>();
+		Queue<BAState> queue = new LinkedList<BAState>();
 		queue.addAll(formulaStates2);
 
 		while (!queue.isEmpty()) {
-			State currentState = queue.remove();
+			BAState currentState = queue.remove();
 			satisfiedStates.add(currentState);
 
-			for (Transition tra : transitions) {
-				State nextState = tra.getBegin();
+			for (KSTransition tra : kSTransitions) {
+				BAState nextState = tra.getBegin();
 
 				if (currentState.equals(tra.getEnd())
 						&& !satisfiedStates.contains(nextState)
@@ -348,12 +348,12 @@ public class CTLChecker {
 		return satisfiedStates;
 	}
 
-	private Set<State> getSCC(Set<State> possibleStates) {
+	private Set<BAState> getSCC(Set<BAState> possibleStates) {
 
-		Set<State> SCC = new HashSet<State>();
-		possibleTransitions = new HashSet<Transition>();
+		Set<BAState> SCC = new HashSet<BAState>();
+		possibleTransitions = new HashSet<KSTransition>();
 
-		for (Transition t : transitions) {
+		for (KSTransition t : kSTransitions) {
 			if (possibleStates.contains(t.getBegin())
 					&& possibleStates.contains(t.getEnd())) {
 				possibleTransitions.add(t);
@@ -364,11 +364,11 @@ public class CTLChecker {
 		lowlinkTable = new HashMap<>();
 		index = 0;
 
-		stack = new Stack<State>();
+		stack = new Stack<BAState>();
 
-		for (State s : possibleStates) {
+		for (BAState s : possibleStates) {
 			if (!indexTable.containsKey(s)) {
-				Set<State> temp = strongConnect(s);
+				Set<BAState> temp = strongConnect(s);
 
 				SCC.addAll(temp);
 			}
@@ -377,20 +377,20 @@ public class CTLChecker {
 		return SCC;
 	}
 
-	private Set<State> strongConnect(State s) {
-		Set<State> SCC = new HashSet<State>();
+	private Set<BAState> strongConnect(BAState s) {
+		Set<BAState> SCC = new HashSet<BAState>();
 
 		indexTable.put(s, index);
 		lowlinkTable.put(s, index);
 		index++;
 		stack.push(s);
 
-		for (Transition t : possibleTransitions) {
+		for (KSTransition t : possibleTransitions) {
 			if (s.equals(t.getBegin())) {
-				State nextState = t.getEnd();
+				BAState nextState = t.getEnd();
 
 				if (!indexTable.containsKey(nextState)) {
-					Set<State> temp = strongConnect(nextState);
+					Set<BAState> temp = strongConnect(nextState);
 
 					SCC.addAll(temp);
 
@@ -408,8 +408,8 @@ public class CTLChecker {
 		}
 
 		if (lowlinkTable.get(s) == indexTable.get(s)) {
-			State SccState;
-			Set<State> temp = new HashSet<State>();
+			BAState SccState;
+			Set<BAState> temp = new HashSet<BAState>();
 
 			do {
 				SccState = stack.pop();
@@ -418,7 +418,7 @@ public class CTLChecker {
 
 			boolean hasTransition = false;
 
-			for (Transition t : possibleTransitions) {
+			for (KSTransition t : possibleTransitions) {
 				if (temp.contains(t.getBegin()) && temp.contains(t.getEnd())) {
 					hasTransition = true;
 					break;
@@ -432,6 +432,6 @@ public class CTLChecker {
 			return SCC;
 		}
 
-		return new HashSet<State>();
+		return new HashSet<BAState>();
 	}
 }

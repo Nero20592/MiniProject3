@@ -8,9 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -25,7 +23,6 @@ import javax.swing.SwingConstants;
 
 import rwth.i2.ltl2ba4j.DottyWriter;
 import rwth.i2.ltl2ba4j.LTL2BA4J;
-import rwth.i2.ltl2ba4j.internal.jnibridge.BAJni;
 import rwth.i2.ltl2ba4j.model.ITransition;
 
 
@@ -46,9 +43,9 @@ public class Gui extends JFrame {
 	JButton check = new JButton("check LTL");
 	JTextField text = new JTextField();
 
-	LTS lts1 = null;
-	LTS lts2 = null;
-	LTS parallelComposition = null;
+	KS lts1 = null;
+	KS lts2 = null;
+	KS parallelComposition = null;
 	BA ba = null;
 
 	JLabel led1 = new JLabel("    •");
@@ -113,7 +110,7 @@ public class Gui extends JFrame {
 
 		        if(approve == JFileChooser.APPROVE_OPTION)
 		        {
-		        	lts1 = LTS.read(chooser.getSelectedFile().getPath());
+		        	lts1 = KS.read(chooser.getSelectedFile().getPath());
 		        }
 			}
 	    });
@@ -140,7 +137,7 @@ public class Gui extends JFrame {
 					JOptionPane.showMessageDialog(null,"You need to load LTS1 to proceed!", "Error",JOptionPane.ERROR_MESSAGE);
 				}else{
 
-					LTS.createGraphBA(ba, "./lts1.png");
+//					KS.createGraphBA(ba, "./lts1.png");
 					
 					openLTS1();
 				}
@@ -156,7 +153,7 @@ public class Gui extends JFrame {
 					JOptionPane.showMessageDialog(null,"You need to load LTS2 to proceed!", "Error",JOptionPane.ERROR_MESSAGE);
 				}else{
 
-					LTS.createGraphBA(ba, "./lts2.png");
+//					KS.createGraphBA(ba, "./lts2.png");
 					
 					openLTS2();
 				}
@@ -173,11 +170,11 @@ public class Gui extends JFrame {
 				}else{
 //					List<LTS> list = new ArrayList<LTS>();
 //					list.add(lts1);
-					ba = BA.transformToBA(lts1);
+					ba = lts1.transformToBA();
 					
 					//parallelComposition = LTS.parallelComposition(list);
 
-					LTS.createGraphBA(ba, "./graph.png");
+					ba.createGraph("./graph.png");
 					
 					openPng();
 				}
@@ -197,7 +194,7 @@ public class Gui extends JFrame {
 
 			        if(approve == JFileChooser.APPROVE_OPTION)
 			        {
-			        	LTS.write(chooser.getSelectedFile().getPath(), parallelComposition);
+			        	KS.write(chooser.getSelectedFile().getPath(), parallelComposition);
 			        }
 				}
 			}
