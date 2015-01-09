@@ -34,7 +34,7 @@ public class Gui extends JFrame {
 	JPanel lts2panel = new JPanel();
 	JPanel cpcpanel = new JPanel();
 	JPanel checkpanel = new JPanel();
-	JButton loadLts1 = new JButton("load LTS1");
+	JButton loadLts1 = new JButton("load KS");
 	JButton LTLtoBA = new JButton("LTL to BA");
 	JButton showBA1 = new JButton("show Büchi Automata 1");
 	JButton showLTLtoBA = new JButton("show LTLtoBA Graph");

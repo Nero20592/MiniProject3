@@ -31,7 +31,7 @@ public class Action {
 	
 	@Override
 	public int hashCode() {
-		return 1;
+		return this.action.hashCode();
 	}
 
 }
