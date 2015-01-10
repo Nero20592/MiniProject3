@@ -7,17 +7,17 @@ public class BATransition {
 
 	BAState begin;
 	BAState end;
-	Set<Action> actions = new HashSet<Action>();
+	Action action;
 
-	public BATransition(BAState begin, BAState end, Set<Action> actions) {
+	public BATransition(BAState begin, BAState end, Action action) {
 		super();
 		this.begin = begin;
 		this.end = end;
-		this.actions = actions;
+		this.action = action;
 	}
 
-	public Set<Action> getActions() {
-		return actions;
+	public Action getAction() {
+		return action;
 	}
 
 	public BAState getBegin() {
@@ -30,26 +30,14 @@ public class BATransition {
 
 	@Override
 	public String toString() {
-		return "(" + begin.toString() + ", " + actions.toString() + ", "
-				+ end.toString() + ")";
+		return "(" + begin.toString() + ", " + action.toString() + ", " + end.toString() + ")";
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (this.getBegin().getName()
-				.equals(((BATransition) o).getBegin().getName())) {
-			if (this.getEnd().getName()
-					.equals(((BATransition) o).getEnd().getName())) {
-				Set<Action> otherActions = ((BATransition) o).getActions();
-				boolean equals = true;
-				for (Action actionA : otherActions) {
-					for (Action actionB : this.actions) {
-						if(actionA.getAction() != actionB.getAction()){
-							equals = false;
-						}
-					}
-				}
-				if(equals){
+		if (this.getBegin().getName().equals(((BATransition) o).getBegin().getName())) {
+			if (this.getEnd().getName().equals(((BATransition) o).getEnd().getName())) {
+				if(this.getEnd().equals(((BATransition) o).getAction())){
 					return true;
 				}
 			}

@@ -130,17 +130,15 @@ public class Gui extends JFrame {
 	    
 	    showBA1.addActionListener(new ActionListener(){
 
-			@Override
+	    	@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				if(ba == null){
-					JOptionPane.showMessageDialog(null,"You need to load LTS1 to proceed!", "Error",JOptionPane.ERROR_MESSAGE);
-				}else{
+				JFileChooser chooser = new JFileChooser();
+		        int approve = chooser.showOpenDialog(null);
 
-//					KS.createGraphBA(ba, "./lts1.png");
-					
-					openLTS1();
-				}
+		        if(approve == JFileChooser.APPROVE_OPTION)
+		        {
+		        	lts2 = KS.read(chooser.getSelectedFile().getPath());
+		        }
 			}
 	    });
 	    
@@ -186,17 +184,17 @@ public class Gui extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				if(ba == null){
-					JOptionPane.showMessageDialog(null,"You need to create a Buechi Automata to proceed!", "Error",JOptionPane.ERROR_MESSAGE);
-				}else{
-					JFileChooser chooser = new JFileChooser();
-			        int approve = chooser.showSaveDialog(null);
+				BA ba1 = lts1.transformToBA();
+				BA ba2 = lts2.transformToBA();
+				BA ba12 = ba1.constructProduct(ba2);
+				
+				//parallelComposition = LTS.parallelComposition(list);
 
-			        if(approve == JFileChooser.APPROVE_OPTION)
-			        {
-			        	KS.write(chooser.getSelectedFile().getPath(), parallelComposition);
-			        }
-				}
+				ba1.createGraph("./ba1.png");
+				ba2.createGraph("./ba2.png");
+				ba12.createGraph("./graph.png");
+				
+				openPng();
 			}
 	    });
 	    
