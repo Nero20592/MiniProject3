@@ -3,12 +3,14 @@ package miniprojekt3;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 
 import att.grappa.Attribute;
 import att.grappa.Edge;
@@ -24,6 +26,13 @@ public class BA {
 	Set<BATransition> transitions = new HashSet<BATransition>();
 	Set<Action> alphabet = new HashSet<Action>();
 
+	// for the search of SCC
+	Set<BATransition> possibleTransitions = new HashSet<BATransition>();
+	HashMap<BAState, Integer> indexTable = new HashMap<>();
+	HashMap<BAState, Integer> lowlinkTable = new HashMap<>();
+	int index = 0;
+	Stack<BAState> stack = new Stack<BAState>();
+	
 	public BA(Set<BAState> bAStates, Set<BAState> initialStates, Set<BAState> acceptingStates, Set<BATransition> transitions, Set<Action> alphabet) {
 		super();
 		this.bAStates = bAStates;
@@ -152,6 +161,135 @@ public class BA {
 		return new BA(reachableStates, initialStates, accepting, transitions, this.alphabet);
 	}
 
+	public boolean checkEmptyness(){
+
+		Set<HashSet<BAState>> SCC = new HashSet<HashSet<BAState>>();
+		possibleTransitions = new HashSet<BATransition>();
+		
+		for (BATransition t : transitions) {
+			if (bAStates.contains(t.getBegin())
+					&& bAStates.contains(t.getEnd())) {
+				possibleTransitions.add(t);
+			}
+		}
+
+		indexTable = new HashMap<>();
+		lowlinkTable = new HashMap<>();
+		index = 0;
+
+		stack = new Stack<BAState>();
+		
+		for (BAState s : bAStates) {
+			if (!indexTable.containsKey(s)) {
+				HashSet<BAState> temp = strongConnect(s);
+
+				SCC.add(temp);
+			}
+		}
+
+		
+		boolean containsAccepting = false;
+		
+		for (HashSet<BAState> set : SCC) {
+			for (BAState s : acceptingStates) {
+				if(set.contains(s)){
+					containsAccepting = true;
+				}
+			}
+			
+			if(containsAccepting){
+				//Breitensuche nach initial
+
+				Set<BAState> reachableStates = new HashSet<BAState>();
+				
+				Queue<BAState> queue = new LinkedList<BAState>();
+				queue.addAll(set);
+				reachableStates.addAll(set);
+				
+				while(!queue.isEmpty()){
+					BAState currentState = queue.remove();
+					
+					for (BATransition t : transitions) {
+						BAState nextState = t.getBegin();
+
+						if (currentState.equals(t.getEnd())
+								&& !reachableStates.contains(nextState)) {
+							
+							if(initialStates.contains(nextState)){
+								return true;
+							}
+							
+							queue.add(nextState);
+							reachableStates.add(nextState);
+						}
+					}
+				}
+			}
+			
+			containsAccepting = false;
+		}
+		
+		return false;
+	}
+
+	private HashSet<BAState> strongConnect(BAState s) {
+		HashSet<BAState> SCC = new HashSet<BAState>();
+
+		indexTable.put(s, index);
+		lowlinkTable.put(s, index);
+		index++;
+		stack.push(s);
+
+		for (BATransition t : possibleTransitions) {
+			if (s.equals(t.getBegin())) {
+				BAState nextState = t.getEnd();
+
+				if (!indexTable.containsKey(nextState)) {
+					Set<BAState> temp = strongConnect(nextState);
+
+					SCC.addAll(temp);
+
+					int i = lowlinkTable.get(s);
+					int j = lowlinkTable.get(nextState);
+
+					lowlinkTable.put(s, Math.min(i, j));
+				} else if (stack.contains(nextState)) {
+					int i = lowlinkTable.get(s);
+					int j = indexTable.get(nextState);
+
+					lowlinkTable.put(s, Math.min(i, j));
+				}
+			}
+		}
+
+		if (lowlinkTable.get(s) == indexTable.get(s)) {
+			BAState SccState;
+			Set<BAState> temp = new HashSet<BAState>();
+
+			do {
+				SccState = stack.pop();
+				temp.add(SccState);
+			} while (!s.equals(SccState));
+
+			boolean hasTransition = false;
+
+			for (BATransition t : possibleTransitions) {
+				if (temp.contains(t.getBegin()) && temp.contains(t.getEnd())) {
+					hasTransition = true;
+					break;
+				}
+			}
+
+			if (hasTransition) {
+				SCC.addAll(temp);
+			}
+
+			return SCC;
+		}
+
+		return new HashSet<BAState>();
+	}
+	
 	public static Set<BAState> getBAState(Set<BAState> states, String first, String second, String third) {
 		Set<BAState> ret = new HashSet<BAState>();
 		if (first == null) {
