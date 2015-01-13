@@ -161,7 +161,7 @@ public class BA {
 		return new BA(reachableStates, initialStates, accepting, transitions, this.alphabet);
 	}
 
-	public boolean checkEmptyness(){
+	public boolean isAcceptedLanguageEmpty(){
 
 		Set<HashSet<BAState>> SCC = new HashSet<HashSet<BAState>>();
 		possibleTransitions = new HashSet<BATransition>();
@@ -216,7 +216,7 @@ public class BA {
 								&& !reachableStates.contains(nextState)) {
 							
 							if(initialStates.contains(nextState)){
-								return true;
+								return false;
 							}
 							
 							queue.add(nextState);
@@ -229,7 +229,7 @@ public class BA {
 			containsAccepting = false;
 		}
 		
-		return false;
+		return true;
 	}
 
 	private HashSet<BAState> strongConnect(BAState s) {
@@ -464,7 +464,17 @@ public class BA {
 		ba2.createGraph("./ba2.png");
 
 		BA product = ba1.constructProduct(ba2);
+		System.out.println(product.isAcceptedLanguageEmpty());
 		product.createGraph("./product.png");
+		
+		
+		KS ks1 = KS.read("C:/Users/Raphael/Documents/KS1.csv");
+		KS ks2 = KS.read("C:/Users/Raphael/Documents/KS2.csv");
+		BA ba3 = ks1.transformToBA();
+		BA ba4 = ks2.transformToBA();
+		BA product2 = ba3.constructProduct(ba4);
+		System.out.println(ba3.isAcceptedLanguageEmpty());
+		ba3.createGraph("./ba1.png");
 	}
 
 }
