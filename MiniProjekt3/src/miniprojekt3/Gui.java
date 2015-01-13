@@ -25,9 +25,8 @@ import rwth.i2.ltl2ba4j.DottyWriter;
 import rwth.i2.ltl2ba4j.LTL2BA4J;
 import rwth.i2.ltl2ba4j.model.ITransition;
 
-
 public class Gui extends JFrame {
-	
+
 	private static final long serialVersionUID = 1L;
 	JPanel panel = new JPanel();
 	JPanel lts1panel = new JPanel();
@@ -51,39 +50,39 @@ public class Gui extends JFrame {
 	JLabel led1 = new JLabel("    •");
 	JLabel led2 = new JLabel("    •");
 	JLabel led3 = new JLabel("    •");
-	
-	public Gui(){
+
+	public Gui() {
 		setTitle("Miniproject");
-	    setResizable(false);
-	    setLocationRelativeTo(null);
-	    setVisible(true);
-	    setDefaultCloseOperation(3);
+		setResizable(false);
+		setLocationRelativeTo(null);
+		setVisible(true);
+		setDefaultCloseOperation(3);
 
-	    panel.setLayout(new GridLayout(6,0));
-	    lts1panel.setLayout(new GridLayout(0,2));
-	    lts2panel.setLayout(new GridLayout(0,2));
-	    cpcpanel.setLayout(new GridLayout(0,2));
-	    checkpanel.setLayout(new GridLayout(0,6));
-	    
-	    panel.add(lts1panel);
-	    lts1panel.add(loadLts1);
-	    lts1panel.add(showBA1);
-	    
-	    panel.add(lts2panel);
-	    lts2panel.add(LTLtoBA);
-	    lts2panel.add(showLTLtoBA);
+		panel.setLayout(new GridLayout(6, 0));
+		lts1panel.setLayout(new GridLayout(0, 2));
+		lts2panel.setLayout(new GridLayout(0, 2));
+		cpcpanel.setLayout(new GridLayout(0, 2));
+		checkpanel.setLayout(new GridLayout(0, 6));
 
-	    panel.add(cpcpanel);
-	    cpcpanel.add(transLTS);
-	    cpcpanel.add(saveBA);
-	    
-	    Font font = new Font(null, Font.BOLD, 14);
-        text.setFont(font);
-        
-	    panel.add(text);
-	    
-	    panel.add(check);
-	    
+		panel.add(lts1panel);
+		lts1panel.add(loadLts1);
+		lts1panel.add(showBA1);
+
+		panel.add(lts2panel);
+		lts2panel.add(LTLtoBA);
+		lts2panel.add(showLTLtoBA);
+
+		panel.add(cpcpanel);
+		cpcpanel.add(transLTS);
+		cpcpanel.add(saveBA);
+
+		Font font = new Font(null, Font.BOLD, 14);
+		text.setFont(font);
+
+		panel.add(text);
+
+		panel.add(check);
+
 		led1.setForeground(Color.gray);
 		led2.setForeground(Color.gray);
 		led3.setForeground(Color.gray);
@@ -94,160 +93,157 @@ public class Gui extends JFrame {
 		checkpanel.add(led2);
 		checkpanel.add(new JLabel("LTS1 || LTS2", SwingConstants.RIGHT));
 		checkpanel.add(led3);
-	    
+
 		panel.add(checkpanel);
-		
-	    add(panel);
-	    
-	    pack();
 
-	    loadLts1.addActionListener(new ActionListener(){
+		add(panel);
+
+		pack();
+
+		loadLts1.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
-		        int approve = chooser.showOpenDialog(null);
+				int approve = chooser.showOpenDialog(null);
 
-		        if(approve == JFileChooser.APPROVE_OPTION)
-		        {
-		        	lts1 = KS.read(chooser.getSelectedFile().getPath());
-		        }
+				if (approve == JFileChooser.APPROVE_OPTION) {
+					lts1 = KS.read(chooser.getSelectedFile().getPath());
+				}
 			}
-	    });
+		});
 
-	    LTLtoBA.addActionListener(new ActionListener(){
+		LTLtoBA.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-		        	//BAJni test = new BAJni(text.getText());     	
-		       Collection<ITransition> automaton = LTL2BA4J.formulaToBA(text.getText());
-		       System.out.println(DottyWriter.automatonToDot(automaton));
 
-		        
+				// BAJni test = new BAJni(text.getText());
+				Collection<ITransition> automaton = LTL2BA4J.formulaToBA(text.getText());
+				System.out.println(DottyWriter.automatonToDot(automaton));
+
 			}
-	    });
-	    
-	    showBA1.addActionListener(new ActionListener(){
+		});
 
-	    	@Override
+		showBA1.addActionListener(new ActionListener() {
+
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
-		        int approve = chooser.showOpenDialog(null);
+				int approve = chooser.showOpenDialog(null);
 
-		        if(approve == JFileChooser.APPROVE_OPTION)
-		        {
-		        	lts2 = KS.read(chooser.getSelectedFile().getPath());
-		        }
+				if (approve == JFileChooser.APPROVE_OPTION) {
+					lts2 = KS.read(chooser.getSelectedFile().getPath());
+				}
 			}
-	    });
-	    
-	    showLTLtoBA.addActionListener(new ActionListener(){
+		});
+
+		showLTLtoBA.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				if(lts2 == null){
-					JOptionPane.showMessageDialog(null,"You need to load LTS2 to proceed!", "Error",JOptionPane.ERROR_MESSAGE);
-				}else{
 
-//					KS.createGraphBA(ba, "./lts2.png");
-					
+				if (lts2 == null) {
+					JOptionPane.showMessageDialog(null, "You need to load LTS2 to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
+				} else {
+
+					// KS.createGraphBA(ba, "./lts2.png");
+
 					openLTS2();
 				}
 			}
-	    });
-	    
-	    transLTS.addActionListener(new ActionListener(){
+		});
+
+		transLTS.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				if(lts1 == null){
-					JOptionPane.showMessageDialog(null,"You need to load an LTS to proceed!", "Error",JOptionPane.ERROR_MESSAGE);
-				}else{
-//					List<LTS> list = new ArrayList<LTS>();
-//					list.add(lts1);
+
+				if (lts1 == null) {
+					JOptionPane.showMessageDialog(null, "You need to load an LTS to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
+				} else {
+					// List<LTS> list = new ArrayList<LTS>();
+					// list.add(lts1);
 					ba = lts1.transformToBA();
-					
-					//parallelComposition = LTS.parallelComposition(list);
+
+					// parallelComposition = LTS.parallelComposition(list);
 
 					ba.createGraph("./graph.png");
-					
+
 					openPng();
 				}
 			}
-	    });
-	    
-	    saveBA.addActionListener(new ActionListener(){
+		});
+
+		saveBA.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				BA ba1 = lts1.transformToBA();
 				BA ba2 = lts2.transformToBA();
 				BA ba12 = ba1.constructProduct(ba2);
-				
-				//parallelComposition = LTS.parallelComposition(list);
+
+				// parallelComposition = LTS.parallelComposition(list);
 
 				ba1.createGraph("./ba1.png");
 				ba2.createGraph("./ba2.png");
 				ba12.createGraph("./graph.png");
-				
+
 				openPng();
 			}
-	    });
-	    
-	    check.addActionListener(new ActionListener() {
-			
+		});
+
+		check.addActionListener(new ActionListener() {
+
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				if(lts1 == null && lts2 == null && parallelComposition == null){
-					JOptionPane.showMessageDialog(null,"You need to load at least one lts to proceed!", "Error",JOptionPane.ERROR_MESSAGE);
-				}else{					
-					if(lts1 != null){
-						CTLChecker c1 = new CTLChecker(lts1);
-						
-						if(c1.checkFormula(new CTLFormula(text.getText())))
-							led1.setForeground(Color.green);
-						else
-							led1.setForeground(Color.red);
-					}
-
-					if(lts2 != null){
-						CTLChecker c2 = new CTLChecker(lts2);
-
-						if(c2.checkFormula(new CTLFormula(text.getText())))
-							led2.setForeground(Color.green);
-						else
-							led2.setForeground(Color.red);
-					}
-					
-					if(parallelComposition != null){
-						CTLChecker c3 = new CTLChecker(parallelComposition);
-
-						if(c3.checkFormula(new CTLFormula(text.getText())))
-							led3.setForeground(Color.green);
-						else
-							led3.setForeground(Color.red);
-					}
-				}
+//				if (lts1 == null && lts2 == null && parallelComposition == null) {
+//					JOptionPane.showMessageDialog(null, "You need to load at least one lts to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
+//				} else {
+//					if (lts1 != null) {
+//						CTLChecker c1 = new CTLChecker(lts1);
+//
+//						if (c1.checkFormula(new CTLFormula(text.getText())))
+//							led1.setForeground(Color.green);
+//						else
+//							led1.setForeground(Color.red);
+//					}
+//
+//					if (lts2 != null) {
+//						CTLChecker c2 = new CTLChecker(lts2);
+//
+//						if (c2.checkFormula(new CTLFormula(text.getText())))
+//							led2.setForeground(Color.green);
+//						else
+//							led2.setForeground(Color.red);
+//					}
+//
+//					if (parallelComposition != null) {
+//						CTLChecker c3 = new CTLChecker(parallelComposition);
+//
+//						if (c3.checkFormula(new CTLFormula(text.getText())))
+//							led3.setForeground(Color.green);
+//						else
+//							led3.setForeground(Color.red);
+//					}
+//				}
 			}
 		});
 	}
-	
-	static void openPng(){
+
+	static void openPng() {
 		final JFrame f = new JFrame();
-		
+
 		f.setTitle("Parallel Composition");
 		f.setResizable(false);
 		f.setVisible(true);
 
 		JPanel p = new JPanel();
-		
+
 		f.add(p);
-		
+
 		BufferedImage myPicture;
 		try {
 			myPicture = ImageIO.read(new File("./graph.png"));
@@ -259,18 +255,18 @@ public class Gui extends JFrame {
 
 		f.pack();
 	}
-	
-	static void openLTS1(){
+
+	static void openLTS1() {
 		final JFrame f = new JFrame();
-		
+
 		f.setTitle("LTS1");
 		f.setResizable(false);
 		f.setVisible(true);
 
 		JPanel p = new JPanel();
-		
+
 		f.add(p);
-		
+
 		BufferedImage myPicture;
 		try {
 			myPicture = ImageIO.read(new File("./lts1.png"));
@@ -282,18 +278,18 @@ public class Gui extends JFrame {
 
 		f.pack();
 	}
-	
-	static void openLTS2(){
+
+	static void openLTS2() {
 		final JFrame f = new JFrame();
-		
+
 		f.setTitle("LTS2");
 		f.setResizable(false);
 		f.setVisible(true);
 
 		JPanel p = new JPanel();
-		
+
 		f.add(p);
-		
+
 		BufferedImage myPicture;
 		try {
 			myPicture = ImageIO.read(new File("./lts2.png"));
@@ -305,9 +301,9 @@ public class Gui extends JFrame {
 
 		f.pack();
 	}
-	
+
 	public static void main(String... args) {
-		
+
 		new Gui();
 	}
 }
