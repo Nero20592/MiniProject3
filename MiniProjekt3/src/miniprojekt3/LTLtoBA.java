@@ -110,17 +110,18 @@ public class LTLtoBA {
 				initStates.add(begin);
 			}
 			if(end.isInitial()){
-				initStates.add(begin);
+				initStates.add(end);
 			}
 			if(begin.isFinal()){
 				accStates.add(begin);
 			}
 			if(end.isFinal()){
-				accStates.add(begin);
+				accStates.add(end);
 			}
 			alphab.add(action);
 			trans.add(transition);
 		}
+		System.out.println(accStates);
 		return new BA(states, initStates, accStates, trans, alphab);
 	}
 	
