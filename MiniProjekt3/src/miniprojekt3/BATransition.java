@@ -1,7 +1,5 @@
 package miniprojekt3;
 
-import java.util.HashSet;
-import java.util.Set;
 
 public class BATransition {
 

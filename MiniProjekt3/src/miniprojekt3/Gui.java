@@ -120,8 +120,16 @@ public class Gui extends JFrame {
 
 				// BAJni test = new BAJni(text.getText());
 				Collection<ITransition> automaton = LTL2BA4J.formulaToBA(text.getText());
-				System.out.println(DottyWriter.automatonToDot(automaton));
-
+				String test = DottyWriter.automatonToDot(automaton);
+				System.out.println(test);
+				BA testBA;
+				LTLtoBA testLTL = new LTLtoBA();
+				testBA = testLTL.transformLTLtoBA(automaton);
+				System.out.println(testBA);
+//				testBA.createGraph("./graph.png");
+//				openPng();
+				//JOptionPane.showMessageDialog(null, test, "LTLtoBA", JOptionPane.ERROR_MESSAGE);
+				
 			}
 		});
 
