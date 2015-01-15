@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import rwth.i2.ltl2ba4j.LTL2BA4J;
+import rwth.i2.ltl2ba4j.model.IGraphProposition;
 import rwth.i2.ltl2ba4j.model.IState;
 import rwth.i2.ltl2ba4j.model.ITransition;
 
@@ -85,6 +87,41 @@ public class LTLtoBA {
 	            
 		return new BA(bAStates, initialStates, acceptingStates, transitions, alphabet);
 		
+	}
+	
+	public static BA ltl2BA(Collection<ITransition> automaton){
+		Set<BAState> states = new HashSet<BAState>();
+		Set<BAState> initStates = new HashSet<BAState>();
+		Set<BAState> accStates = new HashSet<BAState>();
+		Set<BATransition> trans = new HashSet<BATransition>();
+		Set<Action> alphab = new HashSet<Action>();
+		
+		for (ITransition t : automaton) {
+			IState source = t.getSourceState();
+			IState target = t.getTargetState();
+			Set<IGraphProposition> prop = t.getLabels();
+			BAState begin = new BAState(source.getLabel(), source.isInitial(), source.isFinal());
+			BAState end = new BAState(target.getLabel(), target.isInitial(), target.isFinal());
+			Action action = new Action(prop.iterator().next().getFullLabel());
+			BATransition transition = new BATransition(begin, end, action);
+			states.add(begin);
+			states.add(end);
+			if(begin.isInitial()){
+				initStates.add(begin);
+			}
+			if(end.isInitial()){
+				initStates.add(begin);
+			}
+			if(begin.isFinal()){
+				accStates.add(begin);
+			}
+			if(end.isFinal()){
+				accStates.add(begin);
+			}
+			alphab.add(action);
+			trans.add(transition);
+		}
+		return new BA(states, initStates, accStates, trans, alphab);
 	}
 	
 	

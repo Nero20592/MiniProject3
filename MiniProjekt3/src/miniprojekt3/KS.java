@@ -93,7 +93,7 @@ public class KS {
 
 	public static BAState getBAState(Set<BAState> states, String name) {
 		for (BAState state : states) {
-			if (state.getName().equals(name)) {
+			if (state.getLabel().equals(name)) {
 				return state;
 			}
 		}

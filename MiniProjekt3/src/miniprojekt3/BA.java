@@ -80,17 +80,17 @@ public class BA {
 			for (BAState b : other.getStates()) {
 				for (Action action : newAlphabet) {
 					for (int x = 0; x < 3; x++) {
-						BAState begin = getBAState(newStates, a.getName() + "," + b.getName() + "," + x);
+						BAState begin = getBAState(newStates, a.getLabel() + "," + b.getLabel() + "," + x);
 						String endA = "";
 						for (BATransition baTransition : this.getTransitions()) {
-							if (baTransition.getAction().equals(action) && baTransition.getBegin().equals(a)) {
-								endA = baTransition.getEnd().getName();
+							if (baTransition.getAction().equals(action) && baTransition.getSourceState().equals(a)) {
+								endA = baTransition.getTargetState().getLabel();
 							}
 						}
 						String endB = "";
 						for (BATransition baTransition : other.getTransitions()) {
-							if (baTransition.getAction().equals(action) && baTransition.getBegin().equals(b)) {
-								endB = baTransition.getEnd().getName();
+							if (baTransition.getAction().equals(action) && baTransition.getSourceState().equals(b)) {
+								endB = baTransition.getTargetState().getLabel();
 							}
 						}
 						int y = -1;
@@ -129,7 +129,7 @@ public class BA {
 		queue.addAll(initialStates);
 		reachableStates.addAll(initialStates);
 		for (BAState baState : initialStates) {
-			if (baState.isAccepting()) {
+			if (baState.isFinal()) {
 				accepting.add(baState);
 			}
 		}
@@ -138,13 +138,13 @@ public class BA {
 			BAState currentState = queue.remove();
 
 			for (BATransition t : transitions) {
-				BAState nextState = t.getEnd();
+				BAState nextState = t.getTargetState();
 
-				if (currentState.equals(t.getBegin()) && !reachableStates.contains(nextState)) {
+				if (currentState.equals(t.getSourceState()) && !reachableStates.contains(nextState)) {
 
 					queue.add(nextState);
 					reachableStates.add(nextState);
-					if (nextState.isAccepting()) {
+					if (nextState.isFinal()) {
 						accepting.add(nextState);
 					}
 				}
@@ -153,7 +153,7 @@ public class BA {
 
 		for (Iterator<BATransition> iterator2 = transitions.iterator(); iterator2.hasNext();) {
 			BATransition transition = (BATransition) iterator2.next();
-			if (!reachableStates.contains(transition.getBegin()) || !reachableStates.contains(transition.getEnd())) {
+			if (!reachableStates.contains(transition.getSourceState()) || !reachableStates.contains(transition.getTargetState())) {
 				iterator2.remove();
 			}
 		}
@@ -167,8 +167,8 @@ public class BA {
 		possibleTransitions = new HashSet<BATransition>();
 		
 		for (BATransition t : transitions) {
-			if (bAStates.contains(t.getBegin())
-					&& bAStates.contains(t.getEnd())) {
+			if (bAStates.contains(t.getSourceState())
+					&& bAStates.contains(t.getTargetState())) {
 				possibleTransitions.add(t);
 			}
 		}
@@ -210,9 +210,9 @@ public class BA {
 					BAState currentState = queue.remove();
 					
 					for (BATransition t : transitions) {
-						BAState nextState = t.getBegin();
+						BAState nextState = t.getSourceState();
 
-						if (currentState.equals(t.getEnd())
+						if (currentState.equals(t.getTargetState())
 								&& !reachableStates.contains(nextState)) {
 							
 							if(initialStates.contains(nextState)){
@@ -241,8 +241,8 @@ public class BA {
 		stack.push(s);
 
 		for (BATransition t : possibleTransitions) {
-			if (s.equals(t.getBegin())) {
-				BAState nextState = t.getEnd();
+			if (s.equals(t.getSourceState())) {
+				BAState nextState = t.getTargetState();
 
 				if (!indexTable.containsKey(nextState)) {
 					Set<BAState> temp = strongConnect(nextState);
@@ -274,7 +274,7 @@ public class BA {
 			boolean hasTransition = false;
 
 			for (BATransition t : possibleTransitions) {
-				if (temp.contains(t.getBegin()) && temp.contains(t.getEnd())) {
+				if (temp.contains(t.getSourceState()) && temp.contains(t.getTargetState())) {
 					hasTransition = true;
 					break;
 				}
@@ -295,14 +295,14 @@ public class BA {
 		if (first == null) {
 			if (second == null) {
 				for (BAState baState : states) {
-					String[] name = baState.getName().split(",");
+					String[] name = baState.getLabel().split(",");
 					if (third.equals(name[2])) {
 						ret.add(baState);
 					}
 				}
 			} else {
 				for (BAState baState : states) {
-					String[] name = baState.getName().split(",");
+					String[] name = baState.getLabel().split(",");
 					if (second.equals(name[1]) && third.equals(name[2])) {
 						ret.add(baState);
 					}
@@ -310,7 +310,7 @@ public class BA {
 			}
 		} else if (second == null) {
 			for (BAState baState : states) {
-				String[] name = baState.getName().split(",");
+				String[] name = baState.getLabel().split(",");
 				if (first.equals(name[0]) && third.equals(name[2])) {
 					ret.add(baState);
 				}
@@ -321,7 +321,7 @@ public class BA {
 
 	public static BAState getBAState(Set<BAState> states, String name) {
 		for (BAState state : states) {
-			if (state.getName().equals(name)) {
+			if (state.getLabel().equals(name)) {
 				return state;
 			}
 		}
@@ -335,12 +335,12 @@ public class BA {
 		List<Set<BAState>> ret = new ArrayList<Set<BAState>>();
 		for (BAState a : aSet) {
 			for (BAState b : bSet) {
-				states.add(new BAState(a.getName() + "," + b.getName() + "," + 1, false, false));
+				states.add(new BAState(a.getLabel() + "," + b.getLabel() + "," + 1, false, false));
 			}
 		}
 		for (BAState a : aSet) {
 			for (BAState b : bSet) {
-				BAState currentState = new BAState(a.getName() + "," + b.getName() + "," + 2, false, true);
+				BAState currentState = new BAState(a.getLabel() + "," + b.getLabel() + "," + 2, false, true);
 				acceptingStates.add(currentState);
 				states.add(currentState);
 			}
@@ -349,10 +349,10 @@ public class BA {
 			for (BAState b : bSet) {
 				BAState currentState;
 				if (a.isInitial() && b.isInitial()) {
-					currentState = new BAState(a.getName() + "," + b.getName() + "," + 0, true, false);
+					currentState = new BAState(a.getLabel() + "," + b.getLabel() + "," + 0, true, false);
 					initialStates.add(currentState);
 				} else {
-					currentState = new BAState(a.getName() + "," + b.getName() + "," + 0, false, false);
+					currentState = new BAState(a.getLabel() + "," + b.getLabel() + "," + 0, false, false);
 				}
 				states.add(currentState);
 			}
@@ -368,19 +368,19 @@ public class BA {
 		Graph graph = new Graph("BA");
 
 		for (BAState s : this.getStates()) {
-			Node n = new Node(graph, s.getName());
+			Node n = new Node(graph, s.getLabel());
 			graph.addNode(n);
 
 		}
 
 		for (BATransition t : this.getTransitions()) {
-			Edge edge = new Edge(graph, graph.findNodeByName(t.getBegin().getName()), graph.findNodeByName(t.getEnd().getName()));
+			Edge edge = new Edge(graph, graph.findNodeByName(t.getSourceState().getLabel()), graph.findNodeByName(t.getTargetState().getLabel()));
 			edge.setAttribute(Attribute.LABEL_ATTR, "" + t.getAction());
 			graph.addEdge(edge);
 		}
 
 		for (BAState s : this.getInitialStates()) {
-			Node n = graph.findNodeByName(s.getName());
+			Node n = graph.findNodeByName(s.getLabel());
 			Node invis = new Node(graph);
 			Edge start = new Edge(graph, invis, n);
 			graph.addEdge(start);
@@ -391,7 +391,7 @@ public class BA {
 		}
 
 		for (BAState s : this.getAcceptingStates()) {
-			Node n = graph.findNodeByName(s.getName());
+			Node n = graph.findNodeByName(s.getLabel());
 			n.setAttribute(Attribute.SHAPE_ATTR, Node.DOUBLECIRCLE_SHAPE);
 		}
 

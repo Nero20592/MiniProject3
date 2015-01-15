@@ -13,7 +13,7 @@ public class BAState {
 		this.accepting = accepting;
 	}
 
-	public String getName() {
+	public String getLabel() {
 		return name;
 	}
 
@@ -25,7 +25,7 @@ public class BAState {
 		return initial;
 	}
 
-	public boolean isAccepting() {
+	public boolean isFinal() {
 		return accepting;
 	}
 
@@ -36,7 +36,7 @@ public class BAState {
 	
 	@Override
 	public boolean equals(Object arg0) {
-		return this.name.equals(((BAState)arg0).getName());
+		return this.name.equals(((BAState)arg0).getLabel());
 	}
 	
 	@Override

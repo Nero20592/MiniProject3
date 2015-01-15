@@ -34,7 +34,7 @@ public class Gui extends JFrame {
 	JPanel cpcpanel = new JPanel();
 	JPanel checkpanel = new JPanel();
 	JButton loadLts1 = new JButton("load KS");
-	JButton LTLtoBA = new JButton("LTL to BA");
+	JButton lTLtoBAButton = new JButton("LTL to BA");
 	JButton showBA1 = new JButton("show Büchi Automata 1");
 	JButton showLTLtoBA = new JButton("show LTLtoBA Graph");
 	JButton transLTS = new JButton("Transform LTS to BA");
@@ -69,7 +69,7 @@ public class Gui extends JFrame {
 		lts1panel.add(showBA1);
 
 		panel.add(lts2panel);
-		lts2panel.add(LTLtoBA);
+		lts2panel.add(lTLtoBAButton);
 		lts2panel.add(showLTLtoBA);
 
 		panel.add(cpcpanel);
@@ -113,19 +113,19 @@ public class Gui extends JFrame {
 			}
 		});
 
-		LTLtoBA.addActionListener(new ActionListener() {
+		lTLtoBAButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				
 
 				// BAJni test = new BAJni(text.getText());
 				Collection<ITransition> automaton = LTL2BA4J.formulaToBA(text.getText());
 				String test = DottyWriter.automatonToDot(automaton);
 				System.out.println(test);
-				BA testBA;
-				LTLtoBA testLTL = new LTLtoBA();
-				testBA = testLTL.transformLTLtoBA(automaton);
+				BA testBA = LTLtoBA.ltl2BA(automaton);
 				System.out.println(testBA);
+				testBA.createGraph("./ba1.png");
 //				testBA.createGraph("./graph.png");
 //				openPng();
 				//JOptionPane.showMessageDialog(null, test, "LTLtoBA", JOptionPane.ERROR_MESSAGE);

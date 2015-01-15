@@ -18,11 +18,11 @@ public class BATransition {
 		return action;
 	}
 
-	public BAState getBegin() {
+	public BAState getSourceState() {
 		return begin;
 	}
 
-	public BAState getEnd() {
+	public BAState getTargetState() {
 		return end;
 	}
 
@@ -33,9 +33,9 @@ public class BATransition {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this.getBegin().getName().equals(((BATransition) o).getBegin().getName())) {
-			if (this.getEnd().getName().equals(((BATransition) o).getEnd().getName())) {
-				if(this.getEnd().equals(((BATransition) o).getAction())){
+		if (this.getSourceState().getLabel().equals(((BATransition) o).getSourceState().getLabel())) {
+			if (this.getTargetState().getLabel().equals(((BATransition) o).getTargetState().getLabel())) {
+				if(this.getAction().equals(((BATransition) o).getAction())){
 					return true;
 				}
 			}
