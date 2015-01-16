@@ -68,23 +68,25 @@ public class KS {
 		for (KSTransition t : this.ksTransitions) {
 			BAState begin = getBAState(newStates, t.getBegin().getName());
 			BAState end = getBAState(newStates, t.getEnd().getName());
-			String actionS = "";
+			Set<Action> actions = new HashSet<Action>();
 			for (AP ap : t.getEnd().getAPs()) {
-				actionS = actionS + ap.getLabel() + ",";
+				Action current = new Action(ap.getLabel());
+				actions.add(current);
+				
 			}
-			Action action = new Action(actionS.substring(0, actionS.length() - 1));
-			BATransition transition = new BATransition(begin, end, action);
+			BATransition transition = new BATransition(begin, end, actions);
 			newTransitions.add(transition);
 		}
 
 		for (KSState state : this.initialKSStates) {
 			BAState end = getBAState(newStates, state.getName());
-			String actionS = "";
+			Set<Action> actions = new HashSet<Action>();
 			for (AP ap : state.getAPs()) {
-				actionS = actionS + ap.getLabel() + ",";
+				Action current = new Action(ap.getLabel());
+				actions.add(current);
+				
 			}
-			Action action = new Action(actionS.substring(0, actionS.length() - 1));
-			BATransition transition = new BATransition(initial, end, action);
+			BATransition transition = new BATransition(initial, end, actions);
 			newTransitions.add(transition);
 		}
 

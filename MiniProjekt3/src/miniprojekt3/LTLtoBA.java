@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import rwth.i2.ltl2ba4j.LTL2BA4J;
 import rwth.i2.ltl2ba4j.model.IGraphProposition;
 import rwth.i2.ltl2ba4j.model.IState;
 import rwth.i2.ltl2ba4j.model.ITransition;
@@ -104,14 +103,13 @@ public class LTLtoBA {
 					source.isFinal());
 			BAState end = new BAState(target.getLabel(), target.isInitial(),
 					target.isFinal());
-			String actionString = "";
+			Set<Action> actions = new HashSet<Action>();
 			for (IGraphProposition iGraphProposition : prop) {
-				actionString = actionString + iGraphProposition.getLabel()
-						+ ",";
+				Action current = new Action(iGraphProposition.getFullLabel());
+				actions.add(current);
+				
 			}
-			Action action = new Action(actionString.substring(0,
-					actionString.length() - 1));
-			BATransition transition = new BATransition(begin, end, action);
+			BATransition transition = new BATransition(begin, end, actions);
 			states.add(begin);
 			states.add(end);
 			if (begin.isInitial()) {
@@ -126,7 +124,7 @@ public class LTLtoBA {
 			if (end.isFinal()) {
 				accStates.add(end);
 			}
-			alphab.add(action);
+			alphab.addAll(actions);
 			trans.add(transition);
 		}
 		return new BA(states, initStates, accStates, trans, alphab);

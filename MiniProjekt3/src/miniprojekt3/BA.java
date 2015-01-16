@@ -32,7 +32,7 @@ public class BA {
 	HashMap<BAState, Integer> lowlinkTable = new HashMap<>();
 	int index = 0;
 	Stack<BAState> stack = new Stack<BAState>();
-	
+
 	public BA(Set<BAState> bAStates, Set<BAState> initialStates, Set<BAState> acceptingStates, Set<BATransition> transitions, Set<Action> alphabet) {
 		super();
 		this.bAStates = bAStates;
@@ -76,38 +76,35 @@ public class BA {
 		newAcceptingStates.addAll(cartesianProducts.get(2));
 
 		Set<BATransition> newTransitions = new HashSet<BATransition>();
-		for (BAState a : this.getStates()) {
-			for (BAState b : other.getStates()) {
-				for (Action action : newAlphabet) {
-					for (int x = 0; x < 3; x++) {
-						BAState begin = getBAState(newStates, a.getLabel() + "," + b.getLabel() + "," + x);
-						String endA = "";
-						for (BATransition baTransition : this.getTransitions()) {
-							if (baTransition.getAction().equals(action) && baTransition.getSourceState().equals(a)) {
-								endA = baTransition.getTargetState().getLabel();
-							}
-						}
-						String endB = "";
-						for (BATransition baTransition : other.getTransitions()) {
-							if (baTransition.getAction().equals(action) && baTransition.getSourceState().equals(b)) {
-								endB = baTransition.getTargetState().getLabel();
-							}
-						}
-						int y = -1;
-						if (x == 0 && this.getAcceptingStates().contains(getBAState(this.getStates(), endA))) {
-							y = 1;
-						} else if (x == 1 && other.getAcceptingStates().contains(getBAState(other.getStates(), endB))) {
-							y = 2;
-						} else if (x == 2) {
-							y = 0;
-						} else {
-							y = x;
-						}
 
-						BAState end = getBAState(newStates, endA + "," + endB + "," + y);
-						if (end != null) {
-							BATransition newTransition = new BATransition(begin, end, action);
-							newTransitions.add(newTransition);
+		for (BATransition t1 : this.getTransitions()) {
+			for (BATransition t2 : other.getTransitions()) {
+				for (Action a1 : t1.getAction()) {
+					for (Action a2 : t2.getAction()) {
+						if (a1.equals(a2)) {
+							for (int i = 1; i < 3; i++) {
+								BAState source = null;
+								BAState target = null;
+								if (i == 1) {
+									source = getBAState(newStates, t1.getSourceState().getLabel() + "," + t2.getSourceState().getLabel() + ",1");
+									if (!t1.getSourceState().isFinal()) {
+										target = getBAState(newStates, t1.getTargetState().getLabel() + "," + t2.getTargetState().getLabel() + ",1");
+									} else {
+										target = getBAState(newStates, t1.getTargetState().getLabel() + "," + t2.getTargetState().getLabel() + ",2");
+									}
+								} else if(i == 2){
+									source = getBAState(newStates, t1.getSourceState().getLabel() + "," + t2.getSourceState().getLabel() + ",2");
+									if (!t2.getSourceState().isFinal()) {
+										target = getBAState(newStates, t1.getTargetState().getLabel() + "," + t2.getTargetState().getLabel() + ",2");
+									} else {
+										target = getBAState(newStates, t1.getTargetState().getLabel() + "," + t2.getTargetState().getLabel() + ",1");
+									}
+								}
+								Set<Action> actions = new HashSet<Action>();
+								actions.add(a1);
+								BATransition transition = new BATransition(source, target, actions);
+								newTransitions.add(transition);
+							}
 						}
 					}
 				}
@@ -161,14 +158,13 @@ public class BA {
 		return new BA(reachableStates, initialStates, accepting, transitions, this.alphabet);
 	}
 
-	public boolean isAcceptedLanguageEmpty(){
+	public boolean isAcceptedLanguageEmpty() {
 
 		Set<HashSet<BAState>> SCC = new HashSet<HashSet<BAState>>();
 		possibleTransitions = new HashSet<BATransition>();
-		
+
 		for (BATransition t : transitions) {
-			if (bAStates.contains(t.getSourceState())
-					&& bAStates.contains(t.getTargetState())) {
+			if (bAStates.contains(t.getSourceState()) && bAStates.contains(t.getTargetState())) {
 				possibleTransitions.add(t);
 			}
 		}
@@ -178,7 +174,7 @@ public class BA {
 		index = 0;
 
 		stack = new Stack<BAState>();
-		
+
 		for (BAState s : bAStates) {
 			if (!indexTable.containsKey(s)) {
 				HashSet<BAState> temp = strongConnect(s);
@@ -187,48 +183,46 @@ public class BA {
 			}
 		}
 
-		
 		boolean containsAccepting = false;
-		
+
 		for (HashSet<BAState> set : SCC) {
 			for (BAState s : acceptingStates) {
-				if(set.contains(s)){
+				if (set.contains(s)) {
 					containsAccepting = true;
 				}
 			}
-			
-			if(containsAccepting){
-				//Breitensuche nach initial
+
+			if (containsAccepting) {
+				// Breitensuche nach initial
 
 				Set<BAState> reachableStates = new HashSet<BAState>();
-				
+
 				Queue<BAState> queue = new LinkedList<BAState>();
 				queue.addAll(set);
 				reachableStates.addAll(set);
-				
-				while(!queue.isEmpty()){
+
+				while (!queue.isEmpty()) {
 					BAState currentState = queue.remove();
-					
+
 					for (BATransition t : transitions) {
 						BAState nextState = t.getSourceState();
 
-						if (currentState.equals(t.getTargetState())
-								&& !reachableStates.contains(nextState)) {
-							
-							if(initialStates.contains(nextState)){
+						if (currentState.equals(t.getTargetState()) && !reachableStates.contains(nextState)) {
+
+							if (initialStates.contains(nextState)) {
 								return false;
 							}
-							
+
 							queue.add(nextState);
 							reachableStates.add(nextState);
 						}
 					}
 				}
 			}
-			
+
 			containsAccepting = false;
 		}
-		
+
 		return true;
 	}
 
@@ -289,35 +283,6 @@ public class BA {
 
 		return new HashSet<BAState>();
 	}
-	
-	public static Set<BAState> getBAState(Set<BAState> states, String first, String second, String third) {
-		Set<BAState> ret = new HashSet<BAState>();
-		if (first == null) {
-			if (second == null) {
-				for (BAState baState : states) {
-					String[] name = baState.getLabel().split(",");
-					if (third.equals(name[2])) {
-						ret.add(baState);
-					}
-				}
-			} else {
-				for (BAState baState : states) {
-					String[] name = baState.getLabel().split(",");
-					if (second.equals(name[1]) && third.equals(name[2])) {
-						ret.add(baState);
-					}
-				}
-			}
-		} else if (second == null) {
-			for (BAState baState : states) {
-				String[] name = baState.getLabel().split(",");
-				if (first.equals(name[0]) && third.equals(name[2])) {
-					ret.add(baState);
-				}
-			}
-		}
-		return ret;
-	}
 
 	public static BAState getBAState(Set<BAState> states, String name) {
 		for (BAState state : states) {
@@ -335,26 +300,26 @@ public class BA {
 		List<Set<BAState>> ret = new ArrayList<Set<BAState>>();
 		for (BAState a : aSet) {
 			for (BAState b : bSet) {
-				states.add(new BAState(a.getLabel() + "," + b.getLabel() + "," + 1, false, false));
-			}
-		}
-		for (BAState a : aSet) {
-			for (BAState b : bSet) {
-				BAState currentState = new BAState(a.getLabel() + "," + b.getLabel() + "," + 2, false, true);
-				acceptingStates.add(currentState);
-				states.add(currentState);
-			}
-		}
-		for (BAState a : aSet) {
-			for (BAState b : bSet) {
-				BAState currentState;
-				if (a.isInitial() && b.isInitial()) {
-					currentState = new BAState(a.getLabel() + "," + b.getLabel() + "," + 0, true, false);
-					initialStates.add(currentState);
-				} else {
-					currentState = new BAState(a.getLabel() + "," + b.getLabel() + "," + 0, false, false);
+				for (int i = 1; i < 3; i++) {
+					BAState current = null;
+					if(i == 1){
+						if(a.isInitial() && b.isInitial()){
+							current = new BAState(a.getLabel() + "," + b.getLabel() + "," + i, true, false);
+							initialStates.add(current);
+						} else {
+							current = new BAState(a.getLabel() + "," + b.getLabel() + "," + i, false, false);
+						}
+					} else if (i == 2){
+						if(b.isFinal()){
+							current = new BAState(a.getLabel() + "," + b.getLabel() + "," + i, false, true);
+							acceptingStates.add(current);
+						} else {
+							current = new BAState(a.getLabel() + "," + b.getLabel() + "," + i, false, false);
+						}
+					}
+					states.add(current);
+					
 				}
-				states.add(currentState);
 			}
 		}
 		ret.add(states);
@@ -419,13 +384,17 @@ public class BA {
 		BAState r2 = new BAState("r2", false, false);
 		Action a = new Action("a");
 		Action b = new Action("b");
+		Set<Action> aSet = new HashSet<Action>();
+		aSet.add(a);
+		Set<Action> bSet = new HashSet<Action>();
+		bSet.add(b);
 		Set<Action> alphabet = new HashSet<Action>();
 		alphabet.add(a);
 		alphabet.add(b);
-		BATransition r1r2 = new BATransition(r1, r2, b);
-		BATransition r2r1 = new BATransition(r2, r1, a);
-		BATransition r1r1 = new BATransition(r1, r1, a);
-		BATransition r2r2 = new BATransition(r2, r2, b);
+		BATransition r1r2 = new BATransition(r1, r2, bSet);
+		BATransition r2r1 = new BATransition(r2, r1, aSet);
+		BATransition r1r1 = new BATransition(r1, r1, aSet);
+		BATransition r2r2 = new BATransition(r2, r2, bSet);
 		Set<BAState> states = new HashSet<BAState>();
 		Set<BATransition> transitions = new HashSet<BATransition>();
 		states.add(r1);
@@ -442,10 +411,10 @@ public class BA {
 
 		BAState q1 = new BAState("q1", true, true);
 		BAState q2 = new BAState("q2", false, false);
-		BATransition q1q2 = new BATransition(q1, q2, a);
-		BATransition q2q1 = new BATransition(q2, q1, b);
-		BATransition q1q1 = new BATransition(q1, q1, b);
-		BATransition q2q2 = new BATransition(q2, q2, a);
+		BATransition q1q2 = new BATransition(q1, q2, aSet);
+		BATransition q2q1 = new BATransition(q2, q1, bSet);
+		BATransition q1q1 = new BATransition(q1, q1, bSet);
+		BATransition q2q2 = new BATransition(q2, q2, aSet);
 		Set<BAState> states2 = new HashSet<BAState>();
 		Set<BATransition> transitions2 = new HashSet<BATransition>();
 		states2.add(q1);
@@ -461,20 +430,20 @@ public class BA {
 		BA ba2 = new BA(states2, initialStates2, acceptingStates2, transitions2, alphabet);
 
 		ba1.createGraph("./ba1.png");
+		System.out.println(ba1);
 		ba2.createGraph("./ba2.png");
 
 		BA product = ba1.constructProduct(ba2);
 		System.out.println(product.isAcceptedLanguageEmpty());
 		product.createGraph("./product.png");
-		
-		
-		KS ks1 = KS.read("C:/Users/Raphael/Documents/KS1.csv");
-		KS ks2 = KS.read("C:/Users/Raphael/Documents/KS2.csv");
-		BA ba3 = ks1.transformToBA();
-		BA ba4 = ks2.transformToBA();
-		BA product2 = ba3.constructProduct(ba4);
-		System.out.println(ba3.isAcceptedLanguageEmpty());
-		ba3.createGraph("./ba1.png");
+
+//		KS ks1 = KS.read("C:/Users/Raphael/Documents/KS1.csv");
+//		KS ks2 = KS.read("C:/Users/Raphael/Documents/KS2.csv");
+//		BA ba3 = ks1.transformToBA();
+//		BA ba4 = ks2.transformToBA();
+//		BA product2 = ba3.constructProduct(ba4);
+//		System.out.println(ba3.isAcceptedLanguageEmpty());
+//		ba3.createGraph("./ba1.png");
 	}
 
 }

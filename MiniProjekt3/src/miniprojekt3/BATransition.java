@@ -1,21 +1,24 @@
 package miniprojekt3;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class BATransition {
 
 	BAState begin;
 	BAState end;
-	Action action;
+	Set<Action> actions = new HashSet<Action>();
 
-	public BATransition(BAState begin, BAState end, Action action) {
+	public BATransition(BAState begin, BAState end, Set<Action> actions) {
 		super();
 		this.begin = begin;
 		this.end = end;
-		this.action = action;
+		this.actions = actions;
 	}
 
-	public Action getAction() {
-		return action;
+	public Set<Action> getAction() {
+		return actions;
 	}
 
 	public BAState getSourceState() {
@@ -28,7 +31,7 @@ public class BATransition {
 
 	@Override
 	public String toString() {
-		return "(" + begin.toString() + ", " + action.toString() + ", " + end.toString() + ")";
+		return "(" + begin.toString() + ", " + actions.toString() + ", " + end.toString() + ")";
 	}
 
 	@Override
