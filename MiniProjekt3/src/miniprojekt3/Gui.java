@@ -20,8 +20,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-
-import rwth.i2.ltl2ba4j.DottyWriter;
 import rwth.i2.ltl2ba4j.LTL2BA4J;
 import rwth.i2.ltl2ba4j.model.ITransition;
 
@@ -33,23 +31,28 @@ public class Gui extends JFrame {
 	JPanel lts2panel = new JPanel();
 	JPanel cpcpanel = new JPanel();
 	JPanel checkpanel = new JPanel();
-	JButton loadLts1 = new JButton("load KS");
+	JButton loadKS1 = new JButton("load KS");
 	JButton lTLtoBAButton = new JButton("LTL to BA");
 	JButton showBA1 = new JButton("show Büchi Automata 1");
 	JButton showLTLtoBA = new JButton("show LTLtoBA Graph");
-	JButton transLTS = new JButton("Transform LTS to BA");
-	JButton saveBA = new JButton("save BA");
-	JButton check = new JButton("check LTL");
+	JButton transKStoBA = new JButton("Transform KS to BA");
+	JButton constructProduct = new JButton("Save BA");
+	JButton check = new JButton("Check LTL");
 	JTextField text = new JTextField();
 
-	KS lts1 = null;
-	KS lts2 = null;
+	KS ks1 = null;
+	KS ks2 = null;
 	KS parallelComposition = null;
 	BA ba = null;
+	BA ba1 = null;
+	BA ba2 = null;
+	BA ba12 = null;
+	Collection<ITransition> automaton;
 
 	JLabel led1 = new JLabel("    •");
 	JLabel led2 = new JLabel("    •");
 	JLabel led3 = new JLabel("    •");
+	
 
 	public Gui() {
 		setTitle("Miniproject");
@@ -65,7 +68,7 @@ public class Gui extends JFrame {
 		checkpanel.setLayout(new GridLayout(0, 6));
 
 		panel.add(lts1panel);
-		lts1panel.add(loadLts1);
+		lts1panel.add(loadKS1);
 		lts1panel.add(showBA1);
 
 		panel.add(lts2panel);
@@ -73,8 +76,8 @@ public class Gui extends JFrame {
 		lts2panel.add(showLTLtoBA);
 
 		panel.add(cpcpanel);
-		cpcpanel.add(transLTS);
-		cpcpanel.add(saveBA);
+		cpcpanel.add(transKStoBA);
+		cpcpanel.add(constructProduct);
 
 		Font font = new Font(null, Font.BOLD, 14);
 		text.setFont(font);
@@ -87,11 +90,11 @@ public class Gui extends JFrame {
 		led2.setForeground(Color.gray);
 		led3.setForeground(Color.gray);
 
-		checkpanel.add(new JLabel("LTS1", SwingConstants.RIGHT));
+		checkpanel.add(new JLabel("KS1", SwingConstants.RIGHT));
 		checkpanel.add(led1);
-		checkpanel.add(new JLabel("LTS2", SwingConstants.RIGHT));
+		checkpanel.add(new JLabel("LTLtoBA", SwingConstants.RIGHT));
 		checkpanel.add(led2);
-		checkpanel.add(new JLabel("LTS1 || LTS2", SwingConstants.RIGHT));
+		checkpanel.add(new JLabel("LTL satisfied", SwingConstants.RIGHT));
 		checkpanel.add(led3);
 
 		panel.add(checkpanel);
@@ -100,7 +103,7 @@ public class Gui extends JFrame {
 
 		pack();
 
-		loadLts1.addActionListener(new ActionListener() {
+		loadKS1.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -108,7 +111,7 @@ public class Gui extends JFrame {
 				int approve = chooser.showOpenDialog(null);
 
 				if (approve == JFileChooser.APPROVE_OPTION) {
-					lts1 = KS.read(chooser.getSelectedFile().getPath());
+					ks1 = KS.read(chooser.getSelectedFile().getPath());
 				}
 			}
 		});
@@ -118,18 +121,32 @@ public class Gui extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-
-				// BAJni test = new BAJni(text.getText());
-				Collection<ITransition> automaton = LTL2BA4J.formulaToBA(text.getText());
-				String test = DottyWriter.automatonToDot(automaton);
-				System.out.println(test);
-				BA testBA = LTLtoBA.ltl2BA(automaton);
-				System.out.println(testBA);
-				testBA.createGraph("./ba1.png");
-//				testBA.createGraph("./graph.png");
-//				openPng();
-				//JOptionPane.showMessageDialog(null, test, "LTLtoBA", JOptionPane.ERROR_MESSAGE);
-				
+				try{
+				automaton = LTL2BA4J.formulaToBA(text.getText());
+				BA ltlToBA = LTLtoBA.ltl2BA(automaton);
+				ltlToBA.createGraph("./LTLtoBA.png");
+				led2.setForeground(Color.green);
+				}catch(IllegalArgumentException exep){
+				JOptionPane.showMessageDialog(null, "You need to enter a valid LTLFormula! Please use these operators: \r\n"
+						+ "        true, false\r\n" + 
+	                    "        any lowercase string\r\n" + 
+	                    "\r\n" + 
+	                    "Boolean operators:\r\n" + 
+	                    "        !   (negation)\r\n" + 
+	                    "        ->  (implication)\r\n" + 
+	                    "        <-> (equivalence)\r\n" + 
+	                    "        &&  (and)\r\n" + 
+	                    "        ||  (or)\r\n" + 
+	                    "\r\n" + 
+	                    "Temporal operators:\r\n" + 
+	                    "        []  (always)\r\n" + 
+	                    "        <>  (eventually)\r\n" + 
+	                    "        U   (until)\r\n" + 
+	                    "        V   (release)\r\n" + 
+	                    "        X   (next)"
+	                    					, "Error", JOptionPane.ERROR_MESSAGE);
+				automaton = null;
+				}
 			}
 		});
 
@@ -137,68 +154,56 @@ public class Gui extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser chooser = new JFileChooser();
-				int approve = chooser.showOpenDialog(null);
-
-				if (approve == JFileChooser.APPROVE_OPTION) {
-					lts2 = KS.read(chooser.getSelectedFile().getPath());
+				if (ks2 == null && automaton == null) {
+					JOptionPane.showMessageDialog(null, "You need to load a Kripke Structur and enter a valid  LTLFormula  to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
+				} else {
+					openKS1();
 				}
 			}
 		});
+	
 
 		showLTLtoBA.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				if (lts2 == null) {
-					JOptionPane.showMessageDialog(null, "You need to load LTS2 to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
+				if (ks2 == null) {
+					JOptionPane.showMessageDialog(null, "You need to enter a valid  LTLFormula  to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
 				} else {
-
-					// KS.createGraphBA(ba, "./lts2.png");
-
-					openLTS2();
+					openLTLtoBA();
 				}
 			}
 		});
 
-		transLTS.addActionListener(new ActionListener() {
+		transKStoBA.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				if (lts1 == null) {
-					JOptionPane.showMessageDialog(null, "You need to load an LTS to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
+				if (ks1 == null) {
+					JOptionPane.showMessageDialog(null, "You need to load a Kripke Structure to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
 				} else {
-					// List<LTS> list = new ArrayList<LTS>();
-					// list.add(lts1);
-					ba = lts1.transformToBA();
-
-					// parallelComposition = LTS.parallelComposition(list);
-
-					ba.createGraph("./graph.png");
-
-					openPng();
+					ba = ks1.transformToBA();
+					ba.createGraph("./KS1.png");
+					led1.setForeground(Color.green);
 				}
 			}
 		});
 
-		saveBA.addActionListener(new ActionListener() {
+		constructProduct.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (ks1 == null && ks2 == null){
+					JOptionPane.showMessageDialog(null, "You need transform the Kripke Strucure und LTLFormula to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
+				}else{
 
-				BA ba1 = lts1.transformToBA();
-				BA ba2 = lts2.transformToBA();
-				BA ba12 = ba1.constructProduct(ba2);
-
-				// parallelComposition = LTS.parallelComposition(list);
-
-				ba1.createGraph("./ba1.png");
-				ba2.createGraph("./ba2.png");
-				ba12.createGraph("./graph.png");
-
-				openPng();
+				ba1 = ks1.transformToBA();
+				ba2 = ks2.transformToBA();
+				ba12 = ba1.constructProduct(ba2);
+				}
+			
 			}
 		});
 
@@ -207,36 +212,21 @@ public class Gui extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-//				if (lts1 == null && lts2 == null && parallelComposition == null) {
-//					JOptionPane.showMessageDialog(null, "You need to load at least one lts to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
-//				} else {
-//					if (lts1 != null) {
-//						CTLChecker c1 = new CTLChecker(lts1);
-//
-//						if (c1.checkFormula(new CTLFormula(text.getText())))
-//							led1.setForeground(Color.green);
-//						else
-//							led1.setForeground(Color.red);
-//					}
-//
-//					if (lts2 != null) {
-//						CTLChecker c2 = new CTLChecker(lts2);
-//
-//						if (c2.checkFormula(new CTLFormula(text.getText())))
-//							led2.setForeground(Color.green);
-//						else
-//							led2.setForeground(Color.red);
-//					}
-//
-//					if (parallelComposition != null) {
-//						CTLChecker c3 = new CTLChecker(parallelComposition);
-//
-//						if (c3.checkFormula(new CTLFormula(text.getText())))
-//							led3.setForeground(Color.green);
-//						else
-//							led3.setForeground(Color.red);
-//					}
-//				}
+				if (ba12 == null) {
+					JOptionPane.showMessageDialog(null, "You need to construct the Product of both BA's to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
+					
+				}
+				else if(ba12.isAcceptedLanguageEmpty()){
+					ba1.createGraph("./ba1.png");
+					ba2.createGraph("./ba2.png");
+					ba12.createGraph("./graph.png");
+
+					openPng();
+					led3.setForeground(Color.green);
+				}
+				else{
+					JOptionPane.showMessageDialog(null, "Something unexpected happenend", "Error", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 	}
@@ -244,7 +234,7 @@ public class Gui extends JFrame {
 	static void openPng() {
 		final JFrame f = new JFrame();
 
-		f.setTitle("Parallel Composition");
+		f.setTitle("constructed Product");
 		f.setResizable(false);
 		f.setVisible(true);
 
@@ -264,10 +254,10 @@ public class Gui extends JFrame {
 		f.pack();
 	}
 
-	static void openLTS1() {
+	static void openKS1() {
 		final JFrame f = new JFrame();
 
-		f.setTitle("LTS1");
+		f.setTitle("KS1");
 		f.setResizable(false);
 		f.setVisible(true);
 
@@ -277,7 +267,7 @@ public class Gui extends JFrame {
 
 		BufferedImage myPicture;
 		try {
-			myPicture = ImageIO.read(new File("./lts1.png"));
+			myPicture = ImageIO.read(new File("./KS1.png"));
 			JLabel picLabel = new JLabel(new ImageIcon(myPicture));
 			p.add(picLabel);
 		} catch (IOException e) {
@@ -287,10 +277,10 @@ public class Gui extends JFrame {
 		f.pack();
 	}
 
-	static void openLTS2() {
+	static void openLTLtoBA() {
 		final JFrame f = new JFrame();
 
-		f.setTitle("LTS2");
+		f.setTitle("LTLtoBA");
 		f.setResizable(false);
 		f.setVisible(true);
 
@@ -300,7 +290,7 @@ public class Gui extends JFrame {
 
 		BufferedImage myPicture;
 		try {
-			myPicture = ImageIO.read(new File("./lts2.png"));
+			myPicture = ImageIO.read(new File("./LTLtoBA.png"));
 			JLabel picLabel = new JLabel(new ImageIcon(myPicture));
 			p.add(picLabel);
 		} catch (IOException e) {
