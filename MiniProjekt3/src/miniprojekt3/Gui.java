@@ -149,13 +149,28 @@ public class Gui extends JFrame {
 				}
 			}
 		});
+		
+		transKStoBA.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				if (ks1 == null) {
+					JOptionPane.showMessageDialog(null, "You need to load a Kripke Structure to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
+				} else {
+					ba = ks1.transformToBA();
+					ba.createGraph("./KS1.png");
+					led1.setForeground(Color.green);
+				}
+			}
+		});
 
 		showBA1.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (ks2 == null && automaton == null) {
-					JOptionPane.showMessageDialog(null, "You need to load a Kripke Structur and enter a valid  LTLFormula  to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
+				if (ks1 == null && ba == null) {
+					JOptionPane.showMessageDialog(null, "You need to load a Kripke Structur and transform it to BA to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
 				} else {
 					openKS1();
 				}
@@ -176,20 +191,7 @@ public class Gui extends JFrame {
 			}
 		});
 
-		transKStoBA.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				if (ks1 == null) {
-					JOptionPane.showMessageDialog(null, "You need to load a Kripke Structure to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
-				} else {
-					ba = ks1.transformToBA();
-					ba.createGraph("./KS1.png");
-					led1.setForeground(Color.green);
-				}
-			}
-		});
 
 		constructProduct.addActionListener(new ActionListener() {
 
