@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+
 import rwth.i2.ltl2ba4j.LTL2BA4J;
 import rwth.i2.ltl2ba4j.model.ITransition;
 
@@ -47,7 +48,7 @@ public class Gui extends JFrame {
 	BA ba1 = null;
 	BA ba2 = null;
 	BA ba12 = null;
-	Collection<ITransition> automaton;
+	Collection<ITransition> automaton = null;
 
 	JLabel led1 = new JLabel("    •");
 	JLabel led2 = new JLabel("    •");
@@ -120,7 +121,6 @@ public class Gui extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
 				try{
 				automaton = LTL2BA4J.formulaToBA(text.getText());
 				BA ltlToBA = LTLtoBA.ltl2BA(automaton);
@@ -145,7 +145,6 @@ public class Gui extends JFrame {
 	                    "        V   (release)\r\n" + 
 	                    "        X   (next)"
 	                    					, "Error", JOptionPane.ERROR_MESSAGE);
-				automaton = null;
 				}
 			}
 		});

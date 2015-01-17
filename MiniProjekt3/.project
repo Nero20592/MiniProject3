@@ -14,4 +14,10 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<variableList>
+		<variable>
+			<name>t</name>
+			<value>file:/C:/Users/Jannis/Desktop/ltl2ba4j/c-lib</value>
+		</variable>
+	</variableList>
 </projectDescription>
