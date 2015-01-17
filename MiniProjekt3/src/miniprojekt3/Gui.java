@@ -183,7 +183,7 @@ public class Gui extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				if (ks2 == null) {
+				if (automaton == null) {
 					JOptionPane.showMessageDialog(null, "You need to enter a valid  LTLFormula  to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
 				} else {
 					openLTLtoBA();
@@ -197,7 +197,7 @@ public class Gui extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (ks1 == null && ks2 == null){
+				if (ks1 == null && automaton == null){
 					JOptionPane.showMessageDialog(null, "You need transform the Kripke Strucure und LTLFormula to proceed!", "Error", JOptionPane.ERROR_MESSAGE);
 				}else{
 
