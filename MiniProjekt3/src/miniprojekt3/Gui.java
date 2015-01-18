@@ -37,17 +37,17 @@ public class Gui extends JFrame {
 	JButton showBA1 = new JButton("show Büchi Automata 1");
 	JButton showLTLtoBA = new JButton("show LTLtoBA Graph");
 	JButton transKStoBA = new JButton("Transform KS to BA");
-	JButton constructProduct = new JButton("Save BA");
+	JButton constructProduct = new JButton("Construct Product");
 	JButton check = new JButton("Check LTL");
 	JTextField text = new JTextField();
 
 	KS ks1 = null;
-	KS ks2 = null;
 	KS parallelComposition = null;
 	BA ba = null;
 	BA ba1 = null;
 	BA ba2 = null;
 	BA ba12 = null;
+	BA ltlToBA = null;
 	Collection<ITransition> automaton = null;
 
 	JLabel led1 = new JLabel("    •");
@@ -123,7 +123,7 @@ public class Gui extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try{
 				automaton = LTL2BA4J.formulaToBA(text.getText());
-				BA ltlToBA = LTLtoBA.ltl2BA(automaton);
+				ltlToBA = LTLtoBA.ltl2BA(automaton);
 				ltlToBA.createGraph("./LTLtoBA.png");
 				led2.setForeground(Color.green);
 				}catch(IllegalArgumentException exep){
@@ -201,8 +201,7 @@ public class Gui extends JFrame {
 				}else{
 
 				ba1 = ks1.transformToBA();
-				ba2 = ks2.transformToBA();
-				ba12 = ba1.constructProduct(ba2);
+				ba12 = ba1.constructProduct(ltlToBA);
 				}
 			
 			}
@@ -219,7 +218,6 @@ public class Gui extends JFrame {
 				}
 				else if(ba12.isAcceptedLanguageEmpty()){
 					ba1.createGraph("./ba1.png");
-					ba2.createGraph("./ba2.png");
 					ba12.createGraph("./graph.png");
 
 					openPng();
