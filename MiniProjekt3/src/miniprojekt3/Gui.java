@@ -63,13 +63,14 @@ public class Gui extends JFrame {
 		setDefaultCloseOperation(3);
 
 		panel.setLayout(new GridLayout(6, 0));
-		lts1panel.setLayout(new GridLayout(0, 2));
+		lts1panel.setLayout(new GridLayout(0, 3));
 		lts2panel.setLayout(new GridLayout(0, 2));
-		cpcpanel.setLayout(new GridLayout(0, 2));
+		cpcpanel.setLayout(new GridLayout(0, 1));
 		checkpanel.setLayout(new GridLayout(0, 6));
 
 		panel.add(lts1panel);
 		lts1panel.add(loadKS1);
+		lts1panel.add(transKStoBA);
 		lts1panel.add(showBA1);
 
 		panel.add(lts2panel);
@@ -77,7 +78,7 @@ public class Gui extends JFrame {
 		lts2panel.add(showLTLtoBA);
 
 		panel.add(cpcpanel);
-		cpcpanel.add(transKStoBA);
+		
 		cpcpanel.add(constructProduct);
 
 		Font font = new Font(null, Font.BOLD, 14);
