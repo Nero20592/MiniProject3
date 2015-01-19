@@ -72,7 +72,7 @@ public class Gui extends JFrame {
 		lts1panel.add(loadKS1);
 		lts1panel.add(transKStoBA);
 		lts1panel.add(showBA1);
-
+		panel.add(text);
 		panel.add(lts2panel);
 		lts2panel.add(lTLtoBAButton);
 		lts2panel.add(showLTLtoBA);
@@ -84,7 +84,7 @@ public class Gui extends JFrame {
 		Font font = new Font(null, Font.BOLD, 14);
 		text.setFont(font);
 
-		panel.add(text);
+		
 
 		panel.add(check);
 
