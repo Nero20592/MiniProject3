@@ -34,7 +34,7 @@ public class Gui extends JFrame {
 	JPanel checkpanel = new JPanel();
 	JButton loadKS1 = new JButton("load KS");
 	JButton lTLtoBAButton = new JButton("LTL to BA");
-	JButton showBA1 = new JButton("show Büchi Automata 1");
+	JButton showBA1 = new JButton("show KStoBA Graph ");
 	JButton showLTLtoBA = new JButton("show LTLtoBA Graph");
 	JButton transKStoBA = new JButton("Transform KS to BA");
 	JButton constructProduct = new JButton("Construct Product");
@@ -224,7 +224,7 @@ public class Gui extends JFrame {
 					led3.setForeground(Color.green);
 				}
 				else{
-					JOptionPane.showMessageDialog(null, "Something unexpected happenend", "Error", JOptionPane.ERROR_MESSAGE);
+					led3.setForeground(Color.red);
 				}
 			}
 		});
