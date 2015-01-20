@@ -2,8 +2,8 @@ MiniProject3
 ============
 
 Das Programm liegt zum Ausführen als jar-Datei vor.
-Die Jar muss im selben Ordner liegen wie der graphiz-Ordner,
-damit Graphen zur visualisierung gezeichnet werden können.
+Die Jar muss im selben Ordner liegen wie der graphiz-Ordner und der c-lib Ordner liegen,
+damit die Graphen zur visualisierung gezeichnet werden und die LTLFormulas transformiert werden können.
 
 
 Wie können Eingaben gemacht werden?
