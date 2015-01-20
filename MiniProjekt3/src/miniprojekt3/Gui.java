@@ -203,6 +203,10 @@ public class Gui extends JFrame {
 
 				ba1 = ks1.transformToBA();
 				ba12 = ba1.constructProduct(ltlToBA);
+
+				ba12.createGraph("./graph.png");
+
+				openPng();
 				}
 			
 			}
@@ -218,14 +222,11 @@ public class Gui extends JFrame {
 					
 				}
 				else if(ba12.isAcceptedLanguageEmpty()){
-					ba1.createGraph("./ba1.png");
-					ba12.createGraph("./graph.png");
-
-					openPng();
-					led3.setForeground(Color.green);
+					led3.setForeground(Color.red);
 				}
 				else{
-					led3.setForeground(Color.red);
+				
+					led3.setForeground(Color.green);
 				}
 			}
 		});
