@@ -119,11 +119,15 @@ public class Gui extends JFrame {
 		});
 
 		lTLtoBAButton.addActionListener(new ActionListener() {
-
+			
+			
+			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try{
-				automaton = LTL2BA4J.formulaToBA(text.getText());
+					String temp = "!("+ text.getText() + ")";
+					System.out.println(temp);
+				automaton = LTL2BA4J.formulaToBA(temp);
 				ltlToBA = LTLtoBA.ltl2BA(automaton);
 				ltlToBA.createGraph("./LTLtoBA.png");
 				led2.setForeground(Color.green);
