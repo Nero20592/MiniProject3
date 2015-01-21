@@ -125,8 +125,10 @@ public class Gui extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try{
-					String temp = "!("+ text.getText() + ")";
-					System.out.println(temp);
+				String temp = "!("+ text.getText() + ")";
+				if(temp.equals("!()")){
+					temp = "";
+				}
 				automaton = LTL2BA4J.formulaToBA(temp);
 				ltlToBA = LTLtoBA.ltl2BA(automaton);
 				ltlToBA.createGraph("./LTLtoBA.png");
